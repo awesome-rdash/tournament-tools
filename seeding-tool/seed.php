@@ -214,7 +214,7 @@ function encode_name($name) {
 				$player['note'] = 1;
 			}
 		} else {
-			$player['note'] = "0";
+			$player['note'] = 6;
 		}
 	}
 
@@ -316,4 +316,23 @@ function encode_name($name) {
 	usort($teams,"cmp_note");
 
 	$group_number = (int)(ceil(count($teams) / 4));
+
+	$groups = [];
+	for($i = 1; $i <= $group_number; $i++) {
+		$groups[$i] = array(
+			"group_id" => $i
+			);
+	}
+
+	$current_group = 0;
+	foreach($teams as $team) {
+		if ($current_group < $group_number) {
+			$current_group++;
+		} else {
+			$current_group = 1;
+		}
+
+		$groups[$current_group][$team['name']] = $team; 
+	}
+
 	
