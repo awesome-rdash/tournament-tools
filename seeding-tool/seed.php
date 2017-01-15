@@ -221,48 +221,54 @@ function encode_name($name) {
 	//Petite fonction pour obtenir la couleur en fonction de la note
 
 	function get_background_color($note) {
-		switch ($note) {
-			case 1:
-				return "black";
-			case 2:
-				return "black";
-			case 3:
-				return "black";
-			case 4:
-				return "purple";
-			case 5:
-				return "purple";
-			case 6:
-				return "red";
-			case 7:
-				return "orange";
-			case 8:
-				return "orange";
-			case 9:
-				return "yellow";
-			case 10:
-				return "blue";
-			case 11:
-				return "blue";
-			case 12:
-				return "green";
-			case 13:
-				return "green";
+		if ($note > 12) {
+			return "green";
+		} else if ($note > 10) {
+			return "blue";
+		} else if ($note > 9) {
+			return "yellow";
+		} else if ($note > 7) {
+			return "orange";
+		} else if ($note > 6) {
+			return "red";
+		} else if ($note > 4) {
+			return "purple";
+		} else if ($note > 1) {
+			return "black";
+		} else {
 			return "white";
 		}
 	}
 
 	//On va creer un tableau teams avec les informations des joueurs
 
-	function getTeamNote($players, $team) {
+	$teams = [];
+
+	foreach($players as $player) {
+		if (!array_key_exists($player['team'], $teams)) {
+			$teams[$player['team']] = array (
+				"name" => $player['team'],
+				"players" => array (
+					$player['id'] => $player));
+		} else {
+			$teams[$player['team']]['players'][$player['id']] = $player;
+		}
+	}
+
+	foreach($teams as $team) {
 		$playersNote = [];
 
-		foreach($players as $player) {
-			if ($player['note'] != 0 && $player['team'] == $team) {
+		foreach($team['players'] as $player) {
+			if ($player['note'] != 0) {
 				$playersNote[] = $player['note'];
 			}
 		}
-		return (int)(ceil(array_sum($playersNote) / count($playersNote)));
+
+		if (array_sum($playersNote) != 0) {
+			$teams[$team['name']]['note'] = array_sum($playersNote) / count($playersNote);
+		} else {
+			$teams[$team['name']]['note'] = 0;
+		}
 	}
 
 	// On affiche un super tableau maintenant
@@ -277,20 +283,27 @@ function encode_name($name) {
 		<th>Note</th>
 		<th>Moyenne d'equipe</th>
 	</tr>
+
 <?php
-$lastTeam = "";
-foreach ($players as $player) {	
-	$teamNote = getTeamNote($players, $player['team']);
+	$lastTeam = "";
+	foreach ($players as $player) {	
 
-	echo "<tr>";
-	echo "<td>" . $player['name'] . "</td>";
-	echo "<td>" . $player['team'] . "</td>";
-	if (!empty($player['ranked_solo'][0]['tier'])) {
-		echo "<td>" . $player['ranked_solo'][0]['tier'] . " - Division " . $player['ranked_solo'][0]['entries'][0]['division'] . "</td>";
-	} else { echo "<td>Non classe</td>"; }
-	echo "<td style=\"text-decoration:underline; text-align:center; background-color: ". get_background_color($player['note']) .";\" ><mark>" . $player['note'] . "</mark></td>";
-	echo "<td style=\"text-decoration:underline; text-align:center; background-color: ". get_background_color($teamNote) .";\" ><mark>" . $teamNote . "</mark></td>";
-	echo "";
+		echo "<tr>";
+		echo "<td>" . $player['name'] . "</td>";
+		echo "<td>" . $player['team'] . "</td>";
+		if (!empty($player['ranked_solo'][0]['tier'])) {
+			echo "<td>" . $player['ranked_solo'][0]['tier'] . " - Division " . $player['ranked_solo'][0]['entries'][0]['division'] . "</td>";
+		} else { echo "<td>Non classe</td>"; }
+		echo "<td style=\"text-decoration:underline; text-align:center; background-color: ". get_background_color($player['note']) .";\" ><mark>" . $player['note'] . "</mark></td>";
+		echo "<td style=\"text-decoration:underline; text-align:center; background-color: ". get_background_color($teams[$player['team']]['note']) .";\" ><mark>" . 
+		$teams[$player['team']]['note'] . "</mark></td>";
+		echo "";
 
-	echo "<tr />";
-}
+		echo "<tr />";
+	}
+echo "</table>";
+//Maintenant on va repartir les equipes dans des groupes
+/*
+	echo "\$players apres hydratation de l'ID <pre>";
+	print_r($players);
+	echo "<pre />";*/
