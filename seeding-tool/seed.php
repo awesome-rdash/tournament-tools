@@ -301,9 +301,19 @@ function encode_name($name) {
 
 		echo "<tr />";
 	}
-echo "</table>";
-//Maintenant on va repartir les equipes dans des groupes
-/*
-	echo "\$players apres hydratation de l'ID <pre>";
-	print_r($players);
-	echo "<pre />";*/
+	echo "</table>";
+
+	//Maintenant on va repartir les equipes dans des groupes
+
+	//Trie des equipes
+	function cmp_note($a, $b) {
+		if ($a['note'] == $b['note']) {
+			return 0;
+		}
+		return ($a['note'] < $b['note']) ? -1 : 1;
+	}
+
+	usort($teams,"cmp_note");
+
+	$group_number = (int)(ceil(count($teams) / 4));
+	
