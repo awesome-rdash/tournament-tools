@@ -325,6 +325,7 @@ function encode_name($name) {
 	}
 
 	$current_group = 0;
+	$current_seed = 1;
 	foreach($teams as $team) {
 		if ($current_group < $group_number) {
 			$current_group++;
@@ -332,7 +333,29 @@ function encode_name($name) {
 			$current_group = 1;
 		}
 
-		$groups[$current_group][$team['name']] = $team; 
+		$groups[$current_group]['teams'][$team['name']] = $team;
+		$groups[$current_group]['teams'][$team['name']]['seed'] = $current_seed;
+		$current_seed++;
 	}
 
-	
+	echo "Voici la repartition des equipes dans les groupes : <br />";
+
+	$current_group = 1;
+	foreach($groups as $group) {
+		echo "<strong>Groupe " . $group['group_id'] . "</strong>";
+		echo "<table>";
+		echo "<tr>
+					<th width=\"30px\">Seed</th>
+					<th width=\"200px\">Equipe</th>
+					<th>Note moyenne</th>
+				</tr>";
+		foreach($group['teams'] as $team) {
+			echo "<tr>";
+			echo "<td>" . $team['seed'] . "</td>";
+			echo "<td>" . $team['name'] . "</td>";
+			echo "<td style=\"text-decoration:underline; text-align:center; background-color: ". get_background_color($team['note']) .";\" ><mark>" . $team['note'] . "</mark></td>";
+			echo "<tr />";
+		}
+		echo "</table>";
+		$current_group++;
+	}
