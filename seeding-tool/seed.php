@@ -26,7 +26,7 @@ function encode_name($name) {
 }
 
 	//API
-	$db_infos = parse_ini_file("cfg.ini");
+	$db_infos = parse_ini_file("../cfg.ini");
 	$api_key = $db_infos['api_key'];
 
 	echo "<strong>Utilisez l'option refetch_players pour actualiser les rangs + joueurs inscrits </strong>";
@@ -54,7 +54,7 @@ function encode_name($name) {
 		return ($result_array);
 	}
 
-	$csvFile = file('pseudos-prod.csv');
+	$csvFile = file('players-prod.csv');
 	$playersFromFile = [];
 	foreach ($csvFile as $line) {
 		$playersFromFile[] = str_getcsv($line);
@@ -359,3 +359,12 @@ function encode_name($name) {
 		echo "</table>";
 		$current_group++;
 	}
+
+	$out = fopen('export.csv', 'w');
+
+	foreach ($players as $player) {
+		if (!empty($player['ranked_solo'])) {
+			fputcsv($out, array($player['name'], $player['team'], $player['ranked_solo'][0]['tier'] . " - Division " . $player['ranked_solo'][0]['entries'][0]['division']));
+		}
+	}
+	fclose($out);
