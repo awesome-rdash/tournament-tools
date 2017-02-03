@@ -18,6 +18,8 @@
 
  **/
 
+set_time_limit (3600);
+
 function encode_name($name) {
 	$name = mb_strtolower($name, 'UTF-8');
 	$name = str_replace(' ', '', $name);
@@ -49,7 +51,7 @@ function encode_name($name) {
 
 		$result_array = json_decode($result, true);
 
-		sleep(1);
+		sleep(2);
 
 		return ($result_array);
 	}
@@ -81,7 +83,7 @@ function encode_name($name) {
 			$playersToCheck = rtrim($playersToCheck, ',');
 			$api_call_path = "v1.4/summoner/by-name/" . $playersToCheck;
 			$result = api_call($api_call_path);
-			echo "Variable playerstocheck = $playersToCheck <br />";
+			//echo "Variable playerstocheck = $playersToCheck <br />";
 			//echo "Resultat du call API ID from name";
 			//print_r($result);
 
@@ -143,7 +145,7 @@ function encode_name($name) {
 
 			$playersToCheck = rtrim($playersToCheck, ',');
 			$api_call_path = "v2.5/league/by-summoner/" . $playersToCheck . "/entry";
-			echo "APICALL : $api_call_path <br />";
+			//echo "APICALL : $api_call_path <br />";
 			$result = api_call($api_call_path);
 			//print_r($result);
 
