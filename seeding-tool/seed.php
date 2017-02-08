@@ -39,17 +39,33 @@ function encode_name($name) {
 	function api_call($path) {
 		global $api_key;
 
-		$curl_url = "https://euw.api.pvp.net/api/lol/euw/" . $path . '?api_key=' . $api_key;
+		$state = 0;
 
-		$curl = curl_init();
-		curl_setopt($curl, CURLOPT_URL, $curl_url);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		$result = curl_exec($curl);
-		if ($result === false) $result = curl_error($curl);
-		curl_close($curl);
+		while ($state === 0) {
 
-		$result_array = json_decode($result, true);
+			$curl_url = "https://euw.api.pvp.net/api/lol/euw/" . $path . '?api_key=' . $api_key;
+
+			$curl = curl_init();
+			curl_setopt($curl, CURLOPT_URL, $curl_url);
+			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+			$result = curl_exec($curl);
+			if ($result === false) $result = curl_error($curl);
+			curl_close($curl);
+
+			$result_array = json_decode($result, true);
+
+			echo "Call to API was made. Call: <strong> $curl_url </strong> - RESULT: <br /><pre>";
+			print_r($result_array);
+			echo "</pre><br />";
+
+			if (!isset($result_array["status"])) {
+				echo "Result OK <br /><br />";
+				$state = 1;
+			} else {
+				echo "FAIL - RETRY...<br />br />";
+			}
+		}
 
 		sleep(2);
 
@@ -294,7 +310,8 @@ function encode_name($name) {
 		echo "<td>" . $player['name'] . "</td>";
 		echo "<td>" . $player['team'] . "</td>";
 		if (!empty($player['ranked_solo'][0]['tier'])) {
-			echo "<td>" . $player['ranked_solo'][0]['tier'] . " - Division " . $player['ranked_solo'][0]['entries'][0]['division'] . "</td>";
+			echo "<td>" . $player['ranked_solo'][0]['tier'] . " - Division " . $player['ranked_solo'][0]['entries'][0]['division'] . " - Queue : " . $player['ranked_solo'][0]['queue'];
+			echo"</td>";
 		} else { echo "<td>Non classe</td>"; }
 		echo "<td style=\"text-decoration:underline; text-align:center; background-color: ". get_background_color($player['note']) .";\" ><mark>" . $player['note'] . "</mark></td>";
 		echo "<td style=\"text-decoration:underline; text-align:center; background-color: ". get_background_color($teams[$player['team']]['note']) .";\" ><mark>" . 
